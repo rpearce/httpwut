@@ -14,7 +14,7 @@ import (
 
 func usage() {
 	fmt.Println("Get HTTP status code information")
-	fmt.Printf("usage: %s [100..505] [-v|--verbose] [-d|--dogs]\n", os.Args[0])
+	fmt.Printf("usage: %s [100..505] [-v|--verbose] [-c|--cats] [-d|--dogs]\n", os.Args[0])
 }
 
 const helpUsage = "Print usage information"
@@ -42,6 +42,7 @@ type StatusCommand struct {
 	fs *flag.FlagSet
 
 	verbose bool
+	cats    bool
 	dogs    bool
 }
 
@@ -379,7 +380,9 @@ var statuses = map[string]Status{
 }
 
 const helpVerbose = "Print status code description and URL"
+const helpCats = "Open HTTP Status Cats webpage for status"
 const helpDogs = "Open HTTP Status Dogs webpage for status"
+const httpStatusCatsUrl = "https://http.cat/"
 const httpStatusDogsUrl = "https://httpstatusdogs.com/"
 
 func NewStatusCommand(code string) *StatusCommand {
@@ -389,6 +392,8 @@ func NewStatusCommand(code string) *StatusCommand {
 
 	sc.fs.BoolVar(&sc.verbose, "verbose", false, helpVerbose)
 	sc.fs.BoolVar(&sc.verbose, "v", false, helpVerbose)
+	sc.fs.BoolVar(&sc.cats, "cats", false, helpCats)
+	sc.fs.BoolVar(&sc.cats, "c", false, helpCats)
 	sc.fs.BoolVar(&sc.dogs, "dogs", false, helpDogs)
 	sc.fs.BoolVar(&sc.dogs, "d", false, helpDogs)
 
@@ -407,6 +412,10 @@ func (s *StatusCommand) Run() error {
 	if s.verbose {
 		fmt.Println(status.description)
 		fmt.Println(status.url)
+	}
+
+	if s.cats {
+		browser.OpenURL(fmt.Sprint(httpStatusCatsUrl, status.code))
 	}
 
 	if s.dogs {
