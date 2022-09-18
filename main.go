@@ -7,13 +7,15 @@ import (
 	"os"
 )
 
-const helpUsage = "Print usage information"
-const helpVerbose = "Print status code description and URL"
+// =============================================================================
+// Usage and help
 
 func usage() {
 	fmt.Println("Get HTTP status code information")
 	fmt.Printf("usage: %s [100..505] [-v|--verbose]\n", os.Args[0])
 }
+
+const helpUsage = "Print usage information"
 
 func isAskingForHelp() bool {
 	var help bool
@@ -25,11 +27,7 @@ func isAskingForHelp() bool {
 	return help
 }
 
-type Runner interface {
-	Init([]string) error
-	Run() error
-	Name() string
-}
+// =============================================================================
 
 type Status struct {
 	code        string
@@ -38,7 +36,7 @@ type Status struct {
 	url         string
 }
 
-type StatusCodeCommand struct {
+type StatusCommand struct {
 	fs *flag.FlagSet
 
 	verbose bool
@@ -323,8 +321,10 @@ var statuses = map[string]Status{
 	},
 }
 
-func NewStatusCodeCommand(code string) *StatusCodeCommand {
-	sc := &StatusCodeCommand{
+const helpVerbose = "Print status code description and URL"
+
+func NewStatusCommand(code string) *StatusCommand {
+	sc := &StatusCommand{
 		fs: flag.NewFlagSet(code, flag.ContinueOnError),
 	}
 
@@ -334,11 +334,11 @@ func NewStatusCodeCommand(code string) *StatusCodeCommand {
 	return sc
 }
 
-func (s *StatusCodeCommand) Init(args []string) error {
+func (s *StatusCommand) Init(args []string) error {
 	return s.fs.Parse(args)
 }
 
-func (s *StatusCodeCommand) Run() error {
+func (s *StatusCommand) Run() error {
 	status := statuses[s.Name()]
 
 	fmt.Println(status.code + " - " + status.title)
@@ -351,8 +351,16 @@ func (s *StatusCodeCommand) Run() error {
 	return nil
 }
 
-func (s *StatusCodeCommand) Name() string {
+func (s *StatusCommand) Name() string {
 	return s.fs.Name()
+}
+
+// =============================================================================
+
+type Runner interface {
+	Init([]string) error
+	Run() error
+	Name() string
 }
 
 func root(args []string) error {
@@ -370,7 +378,7 @@ func root(args []string) error {
 	cmds := []Runner{}
 
 	for code := range statuses {
-		cmds = append(cmds, NewStatusCodeCommand(code))
+		cmds = append(cmds, NewStatusCommand(code))
 	}
 
 	subcommand := os.Args[1]
