@@ -14,7 +14,7 @@ import (
 
 func usage() {
 	fmt.Println("Get HTTP status code information")
-	fmt.Printf("usage: %s [100..505] [-v|--verbose] [-c|--cats] [-d|--dogs]\n", os.Args[0])
+	fmt.Printf("usage: %s [100..511] [-v|--verbose] [-c|--cats] [-d|--dogs]\n", os.Args[0])
 }
 
 const helpUsage = "Print usage information"
