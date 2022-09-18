@@ -15,6 +15,16 @@ func usage() {
 	fmt.Printf("usage: %s [100..505] [-v|--verbose]\n", os.Args[0])
 }
 
+func isAskingForHelp() bool {
+	var help bool
+
+	flag.BoolVar(&help, "help", false, helpUsage)
+	flag.BoolVar(&help, "h", false, helpUsage)
+	flag.Parse()
+
+	return help
+}
+
 type Runner interface {
 	Init([]string) error
 	Run() error
@@ -352,18 +362,12 @@ func root(args []string) error {
 
 	flag.Usage = usage
 
-	var needsHelp bool
-
-	flag.BoolVar(&needsHelp, "help", false, helpUsage)
-	flag.BoolVar(&needsHelp, "h", false, helpUsage)
-	flag.Parse()
-
-	if needsHelp {
+	if isAskingForHelp() {
 		usage()
 		return nil
 	}
 
-	var cmds []Runner
+	cmds := []Runner{}
 
 	for code := range statuses {
 		cmds = append(cmds, NewStatusCodeCommand(code))
