@@ -5,6 +5,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
+
+	"github.com/pkg/browser"
 )
 
 // =============================================================================
@@ -12,7 +14,7 @@ import (
 
 func usage() {
 	fmt.Println("Get HTTP status code information")
-	fmt.Printf("usage: %s [100..505] [-v|--verbose]\n", os.Args[0])
+	fmt.Printf("usage: %s [100..505] [-v|--verbose] [-d|--dogs]\n", os.Args[0])
 }
 
 const helpUsage = "Print usage information"
@@ -40,6 +42,7 @@ type StatusCommand struct {
 	fs *flag.FlagSet
 
 	verbose bool
+	dogs    bool
 }
 
 var statuses = map[string]Status{
@@ -54,6 +57,12 @@ var statuses = map[string]Status{
 		title:       "Switching Protocols",
 		description: "The server understands and is willing to comply with the client's request, via the Upgrade header field, for a change in the application protocol being used on this connection. The server MUST generate an Upgrade header field in the response that indicates which protocol(s) will be in effect after this response.",
 		url:         "https://www.rfc-editor.org/rfc/rfc9110.html#name-101-switching-protocols",
+	},
+	"103": {
+		code:        "103",
+		title:       "Early Hints",
+		description: "Allows user-agents to perform some operations, such as to speculatively load resources that are likely to be used by the document, before the navigation request is fully handled by the server and a response code is served.",
+		url:         "https://html.spec.whatwg.org/multipage/semantics.html#early-hints",
 	},
 	"200": {
 		code:        "200",
@@ -283,6 +292,24 @@ var statuses = map[string]Status{
 		description: "The server refuses to perform the request using the current protocol but might be willing to do so after the client upgrades to a different protocol.",
 		url:         "https://www.rfc-editor.org/rfc/rfc9110.html#name-426-upgrade-required",
 	},
+	"429": {
+		code:        "429",
+		title:       "Too Many Requests",
+		description: "The user has sent too many requests in a given amount of time (\"rate limiting\").",
+		url:         "https://www.rfc-editor.org/rfc/rfc6585#section-4",
+	},
+	"431": {
+		code:        "431",
+		title:       "Request Header Fields Too Large",
+		description: "The server is unwilling to process the request because its header fields are too large.",
+		url:         "https://www.rfc-editor.org/rfc/rfc6585#section-5",
+	},
+	"451": {
+		code:        "451",
+		title:       "Unavailable For Legal Reasons",
+		description: "The server is denying access to the resource as a consequence of a legal demand.",
+		url:         "https://httpwg.org/specs/rfc7725.html#n-451-unavailable-for-legal-reasons",
+	},
 	"500": {
 		code:        "500",
 		title:       "Internal Server Error",
@@ -319,9 +346,41 @@ var statuses = map[string]Status{
 		description: "The server does not support, or refuses to support, the major version of HTTP that was used in the request message.",
 		url:         "https://www.rfc-editor.org/rfc/rfc9110.html#name-505-http-version-not-suppor",
 	},
+	"506": {
+		code:        "506",
+		title:       "Variant Also Negotiates",
+		description: "The server has an internal configuration error: the chosen variant resource is configured to engage in transparent content negotiation itself, and is therefore not a proper end point in the negotiation process.",
+		url:         "https://www.rfc-editor.org/rfc/rfc2295#section-8.1",
+	},
+	"507": {
+		code:        "507",
+		title:       "Insufficient Storage",
+		description: "The method could not be performed on the resource because the server is unable to store the representation needed to successfully complete the request.",
+		url:         "https://www.rfc-editor.org/rfc/rfc4918#section-11.5",
+	},
+	"508": {
+		code:        "508",
+		title:       "Loop Detected",
+		description: "The server terminated an operation because it encountered an infinite loop while processing a request with \"Depth: infinity\".",
+		url:         "https://www.rfc-editor.org/rfc/rfc5842#section-7.2",
+	},
+	"510": {
+		code:        "510",
+		title:       "Not Extended",
+		description: "The policy for accessing the resource has not been met in the request.",
+		url:         "https://www.rfc-editor.org/rfc/rfc2774#section-7",
+	},
+	"511": {
+		code:        "511",
+		title:       "Network Authentication Required",
+		description: "The client needs to authenticate to gain network access.",
+		url:         "https://www.rfc-editor.org/rfc/rfc6585#section-6",
+	},
 }
 
 const helpVerbose = "Print status code description and URL"
+const helpDogs = "Open HTTP Status Dogs webpage for status"
+const httpStatusDogsUrl = "https://httpstatusdogs.com/"
 
 func NewStatusCommand(code string) *StatusCommand {
 	sc := &StatusCommand{
@@ -330,6 +389,8 @@ func NewStatusCommand(code string) *StatusCommand {
 
 	sc.fs.BoolVar(&sc.verbose, "verbose", false, helpVerbose)
 	sc.fs.BoolVar(&sc.verbose, "v", false, helpVerbose)
+	sc.fs.BoolVar(&sc.dogs, "dogs", false, helpDogs)
+	sc.fs.BoolVar(&sc.dogs, "d", false, helpDogs)
 
 	return sc
 }
@@ -346,6 +407,10 @@ func (s *StatusCommand) Run() error {
 	if s.verbose {
 		fmt.Println(status.description)
 		fmt.Println(status.url)
+	}
+
+	if s.dogs {
+		browser.OpenURL(fmt.Sprint(httpStatusDogsUrl, status.code))
 	}
 
 	return nil
