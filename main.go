@@ -41,6 +41,8 @@ type Status struct {
 type StatusCommand struct {
 	fs *flag.FlagSet
 
+	status Status
+
 	verbose bool
 	cats    bool
 	dogs    bool
@@ -385,19 +387,20 @@ const helpDogs = "Open HTTP Status Dogs webpage for status"
 const httpStatusCatsUrl = "https://http.cat/"
 const httpStatusDogsUrl = "https://httpstatusdogs.com/"
 
-func NewStatusCommand(code string) *StatusCommand {
-	sc := &StatusCommand{
-		fs: flag.NewFlagSet(code, flag.ContinueOnError),
+func NewStatusCommand(status Status) *StatusCommand {
+	s := &StatusCommand{
+		fs:     flag.NewFlagSet(status.code, flag.ContinueOnError),
+		status: status,
 	}
 
-	sc.fs.BoolVar(&sc.verbose, "verbose", false, helpVerbose)
-	sc.fs.BoolVar(&sc.verbose, "v", false, helpVerbose)
-	sc.fs.BoolVar(&sc.cats, "cats", false, helpCats)
-	sc.fs.BoolVar(&sc.cats, "c", false, helpCats)
-	sc.fs.BoolVar(&sc.dogs, "dogs", false, helpDogs)
-	sc.fs.BoolVar(&sc.dogs, "d", false, helpDogs)
+	s.fs.BoolVar(&s.verbose, "verbose", false, helpVerbose)
+	s.fs.BoolVar(&s.verbose, "v", false, helpVerbose)
+	s.fs.BoolVar(&s.cats, "cats", false, helpCats)
+	s.fs.BoolVar(&s.cats, "c", false, helpCats)
+	s.fs.BoolVar(&s.dogs, "dogs", false, helpDogs)
+	s.fs.BoolVar(&s.dogs, "d", false, helpDogs)
 
-	return sc
+	return s
 }
 
 func (s *StatusCommand) Init(args []string) error {
@@ -405,7 +408,7 @@ func (s *StatusCommand) Init(args []string) error {
 }
 
 func (s *StatusCommand) Run() error {
-	status := statuses[s.Name()]
+	status := s.status
 
 	fmt.Println(status.code + " - " + status.title)
 
@@ -431,12 +434,6 @@ func (s *StatusCommand) Name() string {
 
 // =============================================================================
 
-type Runner interface {
-	Init([]string) error
-	Run() error
-	Name() string
-}
-
 func root(args []string) error {
 	if len(args) < 1 {
 		return errors.New("httpwut: Please provide an HTTP status code")
@@ -452,7 +449,7 @@ func root(args []string) error {
 	subcommand := os.Args[1]
 
 	if status, exists := statuses[subcommand]; exists {
-		cmd := NewStatusCommand(status.code)
+		cmd := NewStatusCommand(status)
 		cmd.Init(os.Args[2:])
 		return cmd.Run()
 	}
