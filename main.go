@@ -449,19 +449,12 @@ func root(args []string) error {
 		return nil
 	}
 
-	cmds := []Runner{}
-
-	for code := range statuses {
-		cmds = append(cmds, NewStatusCommand(code))
-	}
-
 	subcommand := os.Args[1]
 
-	for _, cmd := range cmds {
-		if cmd.Name() == subcommand {
-			cmd.Init(os.Args[2:])
-			return cmd.Run()
-		}
+	if status, exists := statuses[subcommand]; exists {
+		cmd := NewStatusCommand(status.code)
+		cmd.Init(os.Args[2:])
+		return cmd.Run()
 	}
 
 	return fmt.Errorf("httpwut: '%s' might not be an HTTP status code", subcommand)
