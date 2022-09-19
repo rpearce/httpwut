@@ -10,12 +10,13 @@ import (
 )
 
 // =============================================================================
-// Usage and help
 
 func usage() {
 	fmt.Println("Get HTTP status code information")
 	fmt.Printf("usage: %s [100..511] [-v|--verbose] [-c|--cats] [-d|--dogs]\n", os.Args[0])
 }
+
+// =============================================================================
 
 const helpUsage = "Print usage information"
 
@@ -384,8 +385,6 @@ var statuses = map[string]Status{
 const helpVerbose = "Print status code description and URL"
 const helpCats = "Open HTTP Status Cats webpage for status"
 const helpDogs = "Open HTTP Status Dogs webpage for status"
-const httpStatusCatsUrl = "https://http.cat/"
-const httpStatusDogsUrl = "https://httpstatusdogs.com/"
 
 func NewStatusCommand(status Status) *StatusCommand {
 	s := &StatusCommand{
@@ -418,11 +417,11 @@ func (s *StatusCommand) Run() error {
 	}
 
 	if s.cats {
-		browser.OpenURL(fmt.Sprint(httpStatusCatsUrl, status.code))
+		browser.OpenURL(fmt.Sprint("https://http.cat/", status.code))
 	}
 
 	if s.dogs {
-		browser.OpenURL(fmt.Sprint(httpStatusDogsUrl, status.code))
+		browser.OpenURL(fmt.Sprint("https://httpstatusdogs.com/", status.code))
 	}
 
 	return nil
@@ -456,6 +455,8 @@ func root(args []string) error {
 
 	return fmt.Errorf("httpwut: '%s' might not be an HTTP status code", subcommand)
 }
+
+// =============================================================================
 
 func main() {
 	if err := root(os.Args[1:]); err != nil {
