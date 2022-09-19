@@ -427,10 +427,6 @@ func (s *StatusCommand) Run() error {
 	return nil
 }
 
-func (s *StatusCommand) Name() string {
-	return s.fs.Name()
-}
-
 // =============================================================================
 
 func root(args []string) error {
