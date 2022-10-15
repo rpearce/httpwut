@@ -417,11 +417,17 @@ func (s *StatusCommand) Run() error {
 	}
 
 	if s.cats {
-		browser.OpenURL(fmt.Sprint("https://http.cat/", status.code))
+		err := browser.OpenURL(fmt.Sprint("https://http.cat/", status.code))
+		if err != nil {
+			return err
+		}
 	}
 
 	if s.dogs {
-		browser.OpenURL(fmt.Sprint("https://httpstatusdogs.com/", status.code))
+		err := browser.OpenURL(fmt.Sprint("https://httpstatusdogs.com/", status.code))
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -430,18 +436,17 @@ func (s *StatusCommand) Run() error {
 // =============================================================================
 
 func root(args []string) error {
+	flag.Usage = usage
+
 	if len(args) < 1 {
 		return errors.New("httpwut: Please provide an HTTP status code")
 	}
-
-	flag.Usage = usage
-
 	if isAskingForHelp() {
 		usage()
 		return nil
 	}
 
-	subcommand := os.Args[1]
+	subcommand := flag.Arg(0)
 
 	if status, exists := statuses[subcommand]; exists {
 		cmd := NewStatusCommand(status)
