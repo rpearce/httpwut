@@ -1,6 +1,6 @@
 # httpwut
 
-CLI tool get HTTP status code information.
+CLI tool to lookup HTTP status code information.
 
 _This is a tool for me to learn Go, so you probably shouldn't use this._
 
