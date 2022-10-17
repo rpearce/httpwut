@@ -357,7 +357,7 @@ var isCmd = &cobra.Command{
 	Long:  "",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
-			return fmt.Errorf("No HTTP status code provided")
+			return fmt.Errorf("no HTTP status code provided")
 		}
 
 		statusCode := args[0]
