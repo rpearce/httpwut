@@ -15,4 +15,5 @@
 # vendor/
 
 # Program output
-bin
+bin/
+dist/
