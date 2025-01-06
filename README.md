@@ -4,8 +4,16 @@ CLI tool to lookup HTTP status code information.
 
 _This is a tool for me to learn Go, so you probably shouldn't use this._
 
+## Installation
+
 ```
-λ httpwut is -h    
+go install github.com/rpearce/httpwut@latest
+```
+
+## Usage
+
+```
+λ httpwut is -h
 Lookup HTTP status codes
 
 Usage:
@@ -17,7 +25,7 @@ Flags:
   -h, --help      help for is
   -v, --verbose   Print status code description and URL
 
-λ httpwut is 502       
+λ httpwut is 502
 502 - Bad Gateway
 
 λ httpwut is 502 --verbose
