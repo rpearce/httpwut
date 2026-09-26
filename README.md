@@ -1,6 +1,8 @@
 # httpwut
 
-CLI tool to lookup HTTP status code information.
+[![CI](https://github.com/rpearce/httpwut/actions/workflows/ci.yml/badge.svg)](https://github.com/rpearce/httpwut/actions/workflows/ci.yml)
+
+CLI tool to look up HTTP status code information.
 
 _This is a tool for me to learn Go, so you probably shouldn't use this._
 
@@ -10,14 +12,17 @@ _This is a tool for me to learn Go, so you probably shouldn't use this._
 go install github.com/rpearce/httpwut@latest
 ```
 
+Prebuilt archives for Linux, macOS, and Windows are attached to each
+[GitHub release](https://github.com/rpearce/httpwut/releases).
+
 ## Usage
 
 ```
 λ httpwut is -h
-Lookup HTTP status codes
+Look up an HTTP status code
 
 Usage:
-  httpwut is [flags]
+  httpwut is <code> [flags]
 
 Flags:
   -c, --cats      Open HTTP Status Cats webpage for status
@@ -34,6 +39,38 @@ The server, while acting as a gateway or proxy, received an invalid response fro
 https://www.rfc-editor.org/rfc/rfc9110.html#name-502-bad-gateway
 ```
 
-Passing `--cats` and/or `--dogs` (you can do both at the time same) will open
-the status codes on https://http.cats and https://httpstatusdogs.com,
+Passing `--cats` and/or `--dogs` (you can do both at the same time) will open
+the status code on https://http.cat and https://httpstatusdogs.com,
 respectively.
+
+### Version
+
+```
+λ httpwut --version
+httpwut version v0.2.0
+```
+
+### Shell completion
+
+`httpwut` can complete status codes for bash, zsh, fish, and PowerShell.
+For zsh, for example:
+
+```
+λ httpwut completion zsh > "${fpath[1]}/_httpwut"
+```
+
+Run `httpwut completion --help` for the other shells.
+
+## Development
+
+Tools are pinned in `.mise.toml`; run `mise install` once. Then:
+
+```
+mise run test       # go test -race -cover -shuffle=on ./...
+mise run lint       # golangci-lint run
+mise run fmt        # golangci-lint fmt
+mise run vuln       # govulncheck ./...
+mise run snapshot   # goreleaser release --snapshot --clean
+```
+
+Releases are cut by pushing a `v*` tag; GitHub Actions runs goreleaser.
